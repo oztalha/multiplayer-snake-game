@@ -181,6 +181,11 @@ class GameEngine: ObservableObject {
         snakes[player].changeDirection(direction)
     }
     
+    func setDirection(player: Int, direction: Direction) {
+        guard player < snakes.count, snakes[player].isAlive else { return }
+        snakes[player].changeDirection(direction)
+    }
+    
     func turnLeft(player: Int) {
         guard player < snakes.count, snakes[player].isAlive else { return }
         let current = snakes[player].direction

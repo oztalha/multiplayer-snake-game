@@ -134,53 +134,50 @@ struct GameView: View {
                 }
                 
                 ForEach(0..<game.snakes.count, id: \.self) { i in
-                    controlButtons(for: i, in: geometry.size)
+                    joystick(for: i, in: geometry.size)
                 }
             }
         }
         .ignoresSafeArea()
     }
     
-    private func controlButtons(for player: Int, in size: CGSize) -> some View {
+    private func joystick(for player: Int, in size: CGSize) -> some View {
         let positions: [(x: CGFloat, y: CGFloat)] = [
-            (x: 80, y: 60),
-            (x: size.width - 80, y: 60),
-            (x: 80, y: size.height - 60),
-            (x: size.width - 80, y: size.height - 60)
+            (x: 80, y: 80),
+            (x: size.width - 80, y: 80),
+            (x: 80, y: size.height - 80),
+            (x: size.width - 80, y: size.height - 80)
         ]
         
         let color = colorFor(game.snakes[player].color)
         let pos = positions[player]
-        let isTopPlayer = player < 2
         
-        let leftButton = Button(action: { game.turnLeft(player: player) }) {
-            Image(systemName: isTopPlayer ? "arrow.turn.down.right" : "arrow.turn.up.left")
-                .font(.system(size: 40))
-                .foregroundColor(.black)
-                .frame(width: 70, height: 70)
-                .background(color)
-                .cornerRadius(10)
-        }
-        
-        let rightButton = Button(action: { game.turnRight(player: player) }) {
-            Image(systemName: isTopPlayer ? "arrow.turn.down.left" : "arrow.turn.up.right")
-                .font(.system(size: 40))
-                .foregroundColor(.black)
-                .frame(width: 70, height: 70)
-                .background(color)
-                .cornerRadius(10)
-        }
-        
-        return HStack(spacing: 20) {
-            if isTopPlayer {
-                rightButton
-                leftButton
-            } else {
-                leftButton
-                rightButton
-            }
+        return ZStack {
+            Circle()
+                .fill(color.opacity(0.3))
+                .frame(width: 150, height: 150)
+            
+            Circle()
+                .fill(color)
+                .frame(width: 50, height: 50)
         }
         .position(x: pos.x, y: pos.y)
+        .gesture(
+            DragGesture(minimumDistance: 15)
+                .onChanged { value in
+                    let dx = value.translation.width
+                    let dy = value.translation.height
+                    
+                    let direction: Direction
+                    if abs(dx) > abs(dy) {
+                        direction = dx > 0 ? .right : .left
+                    } else {
+                        direction = dy > 0 ? .down : .up
+                    }
+                    
+                    game.setDirection(player: player, direction: direction)
+                }
+        )
     }
     
     private func colorFor(_ player: PlayerColor) -> Color {
