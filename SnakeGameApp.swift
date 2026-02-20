@@ -18,10 +18,7 @@ struct ContentView: View {
             case .menu:
                 MenuView(onStart: game.startGame)
             case .countdown:
-                ZStack {
-                    GameView(game: game)
-                    CountdownView(count: game.countdownValue)
-                }
+                CountdownView(count: game.countdownValue)
             case .playing:
                 GameView(game: game)
             case .gameOver:
